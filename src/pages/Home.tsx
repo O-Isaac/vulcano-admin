@@ -16,7 +16,7 @@ export default function Home() {
                 <InteractiveBlob />
 
                 <div className="flex flex-col items-start text-left relative z-10 w-full">
-                    <h1 className="text-4xl md:text-5xl font-medium tracking-tight">Proyecto Vulcano</h1>
+                    <h1 className="text-4xl md:text-7xl font-bold tracking-tight">Proyecto Vulcano</h1>
                     <p className='text-xl md:text-3xl font-medium text-gray-400'>Bienvenido {user?.sub} </p>
                 </div>
             </section>

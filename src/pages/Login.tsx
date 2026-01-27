@@ -109,6 +109,15 @@ export default function Login() {
                             </button>
                         </form>
 
+                        <div className="pt-4 text-center text-sm text-gray-400">
+                            ¿No tienes cuenta?{' '}
+                            <a
+                                href="/register"
+                                className="text-blue-600 hover:underline font-semibold transition-colors"
+                            >
+                                Regístrate
+                            </a>
+                        </div>
                         <div className="pt-8 text-center text-sm text-gray-400 border-t border-gray-100">
                             Hecho por <span className="text-gray-900 font-medium">Isaac Zaragoza Mendoza</span>
                         </div>

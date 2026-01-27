@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import IntroAnimation from '../components/IntroAnimation';
 import { useAuthStore } from '../store/useAuthStore';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Toaster } from 'sonner';
 
 export default function DashboardLayout() {
     const user = useAuthStore((state) => state.user);
@@ -30,6 +31,7 @@ export default function DashboardLayout() {
 
     return (
         <div className="min-h-screen bg-white">
+            <Toaster />
             <AnimatePresence mode="wait">
                 {showIntro && (
                     <IntroAnimation
