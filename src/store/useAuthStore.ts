@@ -49,6 +49,7 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: () => {
+                sessionStorage.removeItem('vulcano_intro_shown');
                 set({
                     accessToken: null,
                     refreshToken: null,
