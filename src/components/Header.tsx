@@ -21,7 +21,7 @@ export default function Header() {
     };
 
     return (
-        <header className="h-20 bg-white/50 backdrop-blur-md flex items-center justify-between px-12 sticky top-0 z-50">
+        <header className="h-20 bg-white/50 backdrop-blur-md flex items-center justify-between px-6 md:px-12 sticky top-0 z-50">
             {/* Left: Branding */}
             <div className="flex items-center gap-3">
                 <Hammer className="w-6 h-6" fill="black" strokeWidth={0} />
