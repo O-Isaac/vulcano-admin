@@ -29,7 +29,7 @@ export default function DashboardLayout() {
 
     return (
         <div className="min-h-screen bg-white">
-            <Toaster />
+            <Toaster richColors theme="dark" />
             <AnimatePresence mode="wait">
                 {showIntro && (
                     <IntroAnimation

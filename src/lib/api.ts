@@ -5,6 +5,7 @@ import ky, {
 } from "ky";
 import { useAuthStore } from "../store/useAuthStore";
 import { type RefreshTokenBody } from "../types/api";
+import { toast } from "sonner";
 
 const API_URL = "http://localhost:8080/api";
 
@@ -59,7 +60,7 @@ const handleResponseError: AfterResponseHook = async (request, options, response
         try {
             const data = await response.json() as { error?: string };
             if (data.error) {
-                throw new Error(data.error);
+                toast.error(data.error);
             }
         } catch (e) {
             // If not JSON or no error field, let ky handle it

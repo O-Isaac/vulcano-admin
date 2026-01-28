@@ -18,7 +18,8 @@ export interface Plano {
   tiempoConstrucion: number
   coste: number
   desc: string
-  recursoFabricado: Recurso
+  recursoFabricado?: Recurso
+  recursoFabricadoId?: number
   componentes?: Componente[]
 }
 
@@ -55,4 +56,20 @@ export interface RefreshTokenBody {
 export interface InventoryItem {
   recurso: Recurso;
   cantidad: number;
+}
+
+export interface Queue {
+  id: number;
+  inicioTime: Date;
+  finalTime: Date;
+  estado: string;
+  jugador: Jugador;
+  plano: Plano;
+}
+
+export interface Jugador {
+  id: number;
+  nivel: number;
+  correo: string;
+  role: string;
 }

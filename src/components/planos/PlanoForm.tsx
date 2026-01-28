@@ -61,10 +61,13 @@ export default function PlanoForm({
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setPlanoData(prev => ({
-            ...prev,
-            [name]: name === 'coste' || name === 'recursoFabricadoId' ? (value === "" ? "" : Number(value)) : value,
-        }));
+        console.log(name, value)
+        setPlanoData(prev => {
+            return {
+                ...prev,
+                [name]: name === 'coste' || name === 'recursoFabricadoId' ? (value === "" ? "" : Number(value)) : value,
+            }
+        })
     };
 
     const publishChanges = (e: React.FormEvent) => {
@@ -181,7 +184,7 @@ export default function PlanoForm({
                             name="recursoFabricadoId"
                             required
                             className="w-full bg-transparent text-lg font-medium focus:outline-none appearance-none cursor-pointer disabled:opacity-50"
-                            value={planoData.recursoFabricado?.id || ""}
+                            value={planoData.recursoFabricadoId || planoData.recursoFabricado?.id || ""}
                             onChange={handleChange}
                             disabled={loadingRecursos || !recursos || recursos.length === 0}
                         >

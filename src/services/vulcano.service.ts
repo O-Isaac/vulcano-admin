@@ -1,5 +1,5 @@
 import { api } from "../lib/api"
-import type { Componente, LoginResponseBody, Plano, Recurso, RegisterResponseBody } from "../types/api"
+import type { Componente, LoginResponseBody, Plano, Queue, Recurso, RegisterResponseBody } from "../types/api"
 
 // Auth
 
@@ -79,15 +79,13 @@ export const addPlanoComponentesBulk = async (planoId: number, componentes: { re
 }
 
 // Fundicion
+export const queuePlano = async (planoId: number) => {
+    const response = await api.post("queues", { json: { planoId } });
+    return response.json<Queue>();
+};
 
-export const createFundicion = async (_fundicion: any) => {
-    throw new Error("Metodo por implementar")
-}
-
-export const updateFundicion = async (_fundicion: any) => {
-    throw new Error("Metodo por implementar")
-}
-
-export const deleteFundicion = async (_id: number) => {
-    throw new Error("Metodo por implementar")
-}
+// Petición optimizada para obtener activos (soporta múltiples)
+export const getActiveQueues = async () => {
+    const response = await api.get("queues/active");
+    return response.json<Queue[]>();
+};
