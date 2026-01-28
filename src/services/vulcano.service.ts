@@ -1,0 +1,93 @@
+import { api } from "../lib/api"
+import type { Componente, LoginResponseBody, Plano, Recurso, RegisterResponseBody } from "../types/api"
+
+// Auth
+
+export const login = (username: string, password: string) => {
+    return api.post("auth/login", { json: { username, password } }).json<LoginResponseBody>()
+}
+
+export const register = (username: string, password: string, secondPassword: string) => {
+    return api.post("auth/register", { json: { username, password, secondPassword } }).json<RegisterResponseBody>()
+}
+
+// Recurso
+
+export const createRecurso = async (recurso: Partial<Recurso>) => {
+    const response = await api.post("recursos", { json: recurso })
+    return response.ok
+}
+
+export const updateRecurso = async (recurso: Partial<Recurso>) => {
+    const response = await api.put(`recursos/${recurso.id}`, { json: recurso })
+    return response.ok
+}
+
+export const deleteRecurso = async (id: number) => {
+    const response = await api.delete(`recursos/${id}`)
+    return response.ok
+}
+
+
+// Plano
+
+export const createPlano = async (plano: Partial<Plano>) => {
+    const response = await api.post("planos", { json: plano })
+    return response.ok
+}
+
+export const updatePlano = async (plano: Partial<Plano>) => {
+    const { id, ...data } = plano
+    const response = await api.put(`planos/${id}`, { json: data })
+    return response.ok
+}
+
+export const deletePlano = async (id: number) => {
+    const response = await api.delete(`planos/${id}`)
+    return response.ok
+}
+
+// Componentes
+
+export const createComponente = async (_componente: any) => {
+    throw new Error("Creation must be performed through a Plano (Hierarchical Model)")
+}
+
+export const getComponentes = async () => {
+    const response = await api.get("componentes")
+    return response.json<Componente[]>()
+}
+
+export const updateComponente = async (id: number, data: { cantidad: number }) => {
+    const response = await api.put(`componentes/${id}`, { json: data })
+    return response.ok
+}
+
+export const deleteComponente = async (id: number) => {
+    const response = await api.delete(`componentes/${id}`)
+    return response.ok
+}
+
+export const getPlanoComponentes = async (planoId: number) => {
+    const response = await api.get(`planos/${planoId}/componentes`)
+    return response.json<Componente[]>()
+}
+
+export const addPlanoComponentesBulk = async (planoId: number, componentes: { recursoId: number, cantidad: number }[]) => {
+    const response = await api.post(`planos/${planoId}/componentes/bulk`, { json: componentes })
+    return response.ok
+}
+
+// Fundicion
+
+export const createFundicion = async (_fundicion: any) => {
+    throw new Error("Metodo por implementar")
+}
+
+export const updateFundicion = async (_fundicion: any) => {
+    throw new Error("Metodo por implementar")
+}
+
+export const deleteFundicion = async (_id: number) => {
+    throw new Error("Metodo por implementar")
+}

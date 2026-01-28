@@ -4,6 +4,10 @@
     --font-sans: "Google Sans Flex", "Google Sans", "Inter", system-ui, sans-serif;
 }
 
+body {
+    overflow-x: hidden;
+}
+
 @keyframes gradient {
     0% {
         background-position: 0% 50%;

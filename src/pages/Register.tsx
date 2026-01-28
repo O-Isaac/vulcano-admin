@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InteractiveBlob from "../components/InteractiveBlob";
 import Header from "../components/Header";
+import { register } from "../services/vulcano.service";
+import { toast } from "sonner";
 
 interface RegisterBody {
   username: string;
@@ -30,16 +32,14 @@ export default function Register() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:8080/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Error en el registro");
-      }
-      navigate("/login");
+      toast.promise(register(form.username, form.password, form.secondPassword), {
+        loading: "Registrando usuario...",
+        success: () => {
+          navigate("/login");
+          return "Usuario registrado correctamente.";
+        },
+        error: "Error al registrar usuario.",
+      })
     } catch (err: any) {
       setError(err.message);
     } finally {

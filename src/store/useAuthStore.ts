@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { jwtDecode } from 'jwt-decode';
-import { AUTH_API } from '../services/auth.service';
+import { login } from '../services/vulcano.service';
 
 interface User {
     iss: string;
@@ -9,6 +9,7 @@ interface User {
     exp: number;
     iat: number;
     roles: string;
+    nivel: number;
 }
 
 interface AuthState {
@@ -30,9 +31,11 @@ export const useAuthStore = create<AuthState>()(
             user: null,
 
             login: async (username, password) => {
-                const response = await AUTH_API.login(username, password);
+                const response = await login(username, password);
+
                 try {
                     const user = jwtDecode<User>(response.access_token);
+
                     set({
                         accessToken: response.access_token,
                         refreshToken: response.refresh_token,
@@ -41,9 +44,6 @@ export const useAuthStore = create<AuthState>()(
                     });
                 } catch (error) {
                     console.error("Failed to decode token", error);
-                    // Still set tokens even if decode fails? Or fail login? 
-                    // For now, let's allow it but user is null, or throw.
-                    // Better to throw.
                     throw new Error('Invalid token received');
                 }
             },

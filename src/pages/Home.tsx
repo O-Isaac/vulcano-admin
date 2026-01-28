@@ -1,4 +1,5 @@
-import { Box, Eye, FileText, Hammer, Pencil, Trash2, User2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Command, Eye, FileText, Hammer, Pencil, Trash2 } from 'lucide-react';
 import DashboardCard from '../components/DashboardCard';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -6,6 +7,7 @@ import InteractiveBlob from '../components/InteractiveBlob';
 
 export default function Home() {
     const user = useAuthStore((state) => state.user);
+    const navigate = useNavigate();
 
     return (
         <>
@@ -22,35 +24,30 @@ export default function Home() {
             </section>
 
             {/* Dashboard Cards */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-gray-200/50 border-y-2 divide-y md:divide-y-0 md:divide-x divide-gray-200/50">
+            <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 border-gray-200/50 border-y-2 divide-y md:divide-y-0 md:divide-x divide-gray-200/50">
+                <DashboardCard
+                    title="Servicios"
+                    icon={Command}
+                    actions={[]}
+                />
                 <DashboardCard
                     title="Recursos"
                     icon={Box}
-                    description="Administrar todos los recursos del servicio"
+                    description="Catálogo maestro de recursos e ítems"
                     actions={[
-                        { label: 'Ver recursos', icon: Eye },
-                        { label: 'Editar recursos', icon: Pencil },
-                        { label: 'Eliminar recursos', icon: Trash2, variant: 'danger' },
-                    ]}
-                />
-                <DashboardCard
-                    title="Jugadores"
-                    icon={User2}
-                    description="Total de jugadores activos en el servicio"
-                    actions={[
-                        { label: 'Ver jugadores', icon: Eye },
-                        { label: 'Editar jugadores', icon: Pencil },
-                        { label: 'Eliminar jugadores', icon: Trash2, variant: 'danger' },
+                        { label: 'Ver recursos', icon: Eye, onClick: () => navigate('/recursos') },
+                        { label: 'Editar recursos', icon: Pencil, onClick: () => navigate('/recursos') },
+                        { label: 'Eliminar recursos', icon: Trash2, variant: 'danger', onClick: () => navigate('/recursos') },
                     ]}
                 />
                 <DashboardCard
                     title="Planos"
                     icon={FileText}
-                    description="Gestión de planos y esquemas"
+                    description="Gestión de planos y esquemas jerárquicos de fabricación"
                     actions={[
-                        { label: 'Ver planos', icon: Eye },
-                        { label: 'Editar planos', icon: Pencil },
-                        { label: 'Eliminar planos', icon: Trash2, variant: 'danger' },
+                        { label: 'Ver planos', icon: Eye, onClick: () => navigate('/planos') },
+                        { label: 'Editar planos', icon: Pencil, onClick: () => navigate('/planos') },
+                        { label: 'Eliminar planos', icon: Trash2, variant: 'danger', onClick: () => navigate('/planos') },
                     ]}
                 />
                 <DashboardCard
@@ -58,9 +55,9 @@ export default function Home() {
                     icon={Hammer}
                     description="Control de procesos de fundición"
                     actions={[
-                        { label: 'Ver fundición', icon: Eye },
-                        { label: 'Editar fundición', icon: Pencil },
-                        { label: 'Eliminar fundición', icon: Trash2, variant: 'danger' },
+                        { label: 'Ver fundición', icon: Eye, onClick: () => navigate('/fundicion') },
+                        { label: 'Editar fundición', icon: Pencil, onClick: () => navigate('/fundicion') },
+                        { label: 'Eliminar fundición', icon: Trash2, variant: 'danger', onClick: () => navigate('/fundicion') },
                     ]}
                 />
             </section>

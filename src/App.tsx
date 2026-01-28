@@ -11,6 +11,9 @@ import DashboardLayout from './layouts/DashboardLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import RecursosPages from './pages/Recursos';
+import PlanosPage from './pages/Planos';
+import FundicionPage from './pages/Fundicion';
+import InventoryPage from './pages/Inventory';
 import Register from './pages/Register';
 
 const router = createBrowserRouter(
@@ -25,6 +28,9 @@ const router = createBrowserRouter(
       <Route element={<AuthGuard />}>
         <Route element={<DashboardLayout />}>
           <Route path="/recursos" element={<RecursosPages />} />
+          <Route path="/planos" element={<PlanosPage />} />
+          <Route path="/fundicion" element={<FundicionPage />} />
+          <Route path="/inventario" element={<InventoryPage />} />
         </Route>
       </Route>
       <Route element={<AuthGuard />}>

@@ -10,7 +10,7 @@ interface Action {
 interface DashboardCardProps {
     title: string;
     icon: LucideIcon;
-    description: string;
+    description?: string;
     actions: Action[];
 }
 
@@ -47,10 +47,13 @@ export default function DashboardCard({ title, icon: Icon, description, actions 
                 </div>
             </div>
 
-            <div>
-                <h3 className='font-medium mb-1'>Descripción</h3>
-                <p className="text-gray-500 text-sm">{description}</p>
-            </div>
+            {description && (
+                <div>
+                    <h3 className='font-medium mb-1'>Descripción</h3>
+                    <p className="text-gray-500 text-sm">{description}</p>
+                </div>
+            )}
+
         </div>
     );
 }

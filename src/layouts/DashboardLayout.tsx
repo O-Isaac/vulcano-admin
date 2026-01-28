@@ -12,7 +12,6 @@ export default function DashboardLayout() {
     const [isAppReady, setIsAppReady] = useState(false);
 
     useEffect(() => {
-        // Check if intro has been shown in this session
         const hasShownIntro = sessionStorage.getItem('vulcano_intro_shown');
 
         if (!hasShownIntro) {
@@ -25,7 +24,6 @@ export default function DashboardLayout() {
     const handleIntroComplete = () => {
         setShowIntro(false);
         sessionStorage.setItem('vulcano_intro_shown', 'true');
-        // Quicker handoff
         setTimeout(() => setIsAppReady(true), 150);
     };
 

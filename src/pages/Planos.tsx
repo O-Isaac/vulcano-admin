@@ -1,38 +1,37 @@
-import RecursoForm from "../components/recursos/RecursoForm";
-import RecursoList from "../components/recursos/RecursoList";
-import RecursoHero from "../components/recursos/RecursoHero";
-import RecursoSidebar from "../components/recursos/RecursoSidebar";
-import { useRecursos } from "../hooks/useRecursos";
-
-import { Package } from "lucide-react";
+import PlanoForm from "../components/planos/PlanoForm";
+import PlanoList from "../components/planos/PlanoList";
+import PlanoHero from "../components/planos/PlanoHero";
+import PlanoSidebar from "../components/planos/PlanoSidebar";
+import { usePlanos } from "../hooks/usePlanos";
+import { FileText } from "lucide-react";
 
 import { Drawer } from "vaul";
 
-export default function RecursosPages() {
+export default function PlanosPage() {
     const {
-        recursos,
+        planos,
         error,
         isLoading,
-        selectedRecurso,
+        selectedPlano,
         adding,
         handleAdd,
         handleUpdate,
         handleDelete,
-        selectRecurso,
+        selectPlano,
         startAdding,
         cancelAdding
-    } = useRecursos();
+    } = usePlanos();
 
     // Determine if drawer should be open
-    const isDrawerOpen = !!selectedRecurso || adding;
+    const isDrawerOpen = !!selectedPlano || adding;
 
     if (isLoading) {
-        return <div className="p-8 text-gray-400 font-medium animate-pulse font-inter">Cargando recursos...</div>;
+        return <div className="p-6 text-gray-400 font-medium font-inter">Cargando planos...</div>;
     }
 
     if (error) {
-        console.log(error);
-        return <div className="p-8 text-red-500 font-medium font-inter">Error al cargar los recursos.</div>;
+        console.error(error);
+        return <div className="p-6 text-red-500 font-medium font-inter">Error al cargar los planos.</div>;
     }
 
     return (
@@ -41,33 +40,33 @@ export default function RecursosPages() {
             onOpenChange={(open) => {
                 if (!open) {
                     if (adding) cancelAdding();
-                    else selectRecurso(null);
+                    else selectPlano(null);
                 }
             }}
             direction="right"
         >
-            <RecursoHero
-                title="Recursos"
-                subtitle="Administra todos los recursos del servicio"
+            <PlanoHero
+                title="Planos"
+                subtitle="Gestión de planos y esquemas"
             />
 
             <section className="flex flex-col lg:flex-row border-b border-gray-300 min-h-[80vh] divide-y lg:divide-y-0 lg:divide-x divide-gray-300 bg-white">
                 <div className="lg:w-[320px] shrink-0 bg-gray-50/30">
-                    <RecursoSidebar
+                    <PlanoSidebar
                         title="Listado"
                         onAdd={startAdding}
                     />
                 </div>
 
                 <div className="flex-1 min-w-0 bg-white overflow-hidden">
-                    {recursos && recursos.length > 0 ? (
-                        <RecursoList recursos={recursos} onSelect={selectRecurso} />
+                    {planos && planos.length > 0 ? (
+                        <PlanoList planos={planos} onSelect={selectPlano} />
                     ) : (
                         <div className="p-20 text-center flex flex-col items-center gap-4">
                             <div className="size-16 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
-                                <Package className="size-8" />
+                                <FileText className="size-8" />
                             </div>
-                            <p className="text-gray-400 font-medium italic">No hay recursos disponibles.</p>
+                            <p className="text-gray-400 font-medium italic">No hay planos registrados.</p>
                         </div>
                     )}
                 </div>
@@ -78,19 +77,28 @@ export default function RecursosPages() {
                 <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] lg:rounded-t-0 lg:rounded-l-[20px] h-full mt-24 fixed bottom-0 right-0 z-50 w-full lg:w-[550px] outline-none shadow-2xl overflow-hidden border-l border-gray-200">
                     <div className="flex-1 h-full">
                         {adding ? (
-                            <RecursoForm
-                                recurso={{ nombre: "", desc: "", rareza: "comun" }}
+                            <PlanoForm
+                                plano={{
+                                    nombre: "",
+                                    coste: 0,
+                                    tiempoConstrucion: 0,
+                                    desc: "",
+                                    recursoFabricado: {
+                                        desc: "",
+                                        id: 0,
+                                        nombre: "",
+                                        rareza: ""
+                                    }
+                                }}
                                 onUpdate={handleAdd}
-                                onDelete={() => { }} // Not needed for adding
-                                onClose={cancelAdding}
+                                onDelete={cancelAdding}
                                 isNew
                             />
-                        ) : selectedRecurso ? (
-                            <RecursoForm
-                                recurso={selectedRecurso}
+                        ) : selectedPlano ? (
+                            <PlanoForm
+                                plano={selectedPlano}
                                 onUpdate={handleUpdate}
                                 onDelete={handleDelete}
-                                onClose={() => selectRecurso(null)}
                             />
                         ) : null}
                     </div>

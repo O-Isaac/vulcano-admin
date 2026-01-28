@@ -1,4 +1,4 @@
-import { Users, FileText, Pickaxe, Hammer, LogOut } from 'lucide-react';
+import { FileText, Hammer, LogOut, Package, Pickaxe } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -15,20 +15,16 @@ export default function Sidebar() {
 
     const isActive = (path: string) => location.pathname === path;
 
-    // Determine roles
-    const isAdmin = user?.roles?.includes('ADMIN');
-    // const isJugador = user?.roles?.includes('JUGADOR') || isAdmin; // Admin usually implies access, or check specific logic. User said Planos (Jugador/Admin)
-
     const navItems = [
-        ...(isAdmin ? [{ name: 'Jugadores', icon: Users, path: '/players' }] : []),
-        { name: 'Planos', icon: FileText, path: '/blueprints' },
-        { name: 'Recursos', icon: Pickaxe, path: '/resources' },
-        { name: 'Fundición', icon: Hammer, path: '/foundry' },
+        { name: 'Componentes', icon: Package, path: '/componentes' },
+        { name: 'Planos', icon: FileText, path: '/planos' },
+        { name: 'Recursos', icon: Pickaxe, path: '/recursos' },
+        { name: 'Fundición', icon: Hammer, path: '/fundicion' },
     ];
 
     return (
         <aside className="hidden lg:flex flex-col w-[280px] bg-white min-h-screen fixed left-0 top-0 z-20 border-r border-[#dadce0] py-6 px-4">
-            {/* Brand - Antigravity "V" matches Login */}
+            {/* Brand - Vulcano logo */}
             <div className="flex items-center px-4 mb-12">
                 <div className="h-10 w-10 bg-[#1a73e8] rounded-xl flex items-center justify-center mr-3 shadow-sm">
                     <span className="text-white font-bold text-xl leading-none">V</span>

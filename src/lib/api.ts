@@ -1,86 +1,87 @@
-import { AUTH_API } from '../services/auth.service';
-import { useAuthStore } from '../store/useAuthStore';
-import type { Recurso } from '../types/api';
+import ky, {
+    type AfterResponseHook,
+    type BeforeRequestHook,
+    type BeforeRetryHook
+} from "ky";
+import { useAuthStore } from "../store/useAuthStore";
+import { type RefreshTokenBody } from "../types/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_URL = "http://localhost:8080/api";
 
-// Helper to create authenticated fetch wrapper
-export const apiFetch = async (url: string, options: RequestInit = {}) => {
-    let accessToken = useAuthStore.getState().accessToken;
+let refreshPromise: Promise<RefreshTokenBody> | null = null;
 
-    // Prepend base URL if not absolute
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = API_BASE_URL + url;
+// Hook para insertar el token en cada peticion
+const setTokenHeader: BeforeRequestHook = (request) => {
+    const token = useAuthStore.getState().accessToken;
+
+    if (token) {
+        request.headers.set("Authorization", `Bearer ${token}`);
     }
+}
 
-    // Attach token if needed
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    } as Record<string, string>;
+// Hook para refrescar el token
+const refreshToken: BeforeRetryHook = async ({ request, options, error, retryCount }) => {
+    const refreshToken = useAuthStore.getState().refreshToken;
 
-    if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
+    if (!refreshToken) return ky.stop;
+
+    try {
+        // Si ya hay un refresco en curso, esperamos a ese.
+        // Si no, creamos uno nuevo.
+        if (!refreshPromise) {
+            refreshPromise = ky.post(`${API_URL}/auth/refresh`, {
+                json: { refresh_token: refreshToken }
+            }).json<RefreshTokenBody>();
+        }
+
+        const data = await refreshPromise;
+
+        useAuthStore.setState({
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token
+        });
+
+        // Limpiamos la promesa para futuros refrescos (cuando el nuevo expire)
+        refreshPromise = null;
+
+        // Seteamos el nuevo token en la petición que se va a reintentar
+        request.headers.set("Authorization", `Bearer ${data.access_token}`);
+    } catch (error) {
+        refreshPromise = null; // Limpiar si falla
+        useAuthStore.getState().logout?.();
+        return ky.stop;
     }
+}
 
-    let response = await fetch(url, { ...options, headers });
-
-    // Handle 401 - Try to refresh
-    if (response.status === 401) {
+// Hook para manejar errores en la respuesta
+const handleResponseError: AfterResponseHook = async (request, options, response) => {
+    if (!response.ok) {
         try {
-            const refreshToken = useAuthStore.getState().refreshToken;
-            if (!refreshToken) throw new Error('No refresh token');
-
-            const newTokens = await AUTH_API.refresh(refreshToken);
-
-            // Update store
-            useAuthStore.getState().setTokens(newTokens.access_token, newTokens.refresh_token);
-
-            // Retry original request with new token
-            headers['Authorization'] = `Bearer ${newTokens.access_token}`;
-            response = await fetch(url, { ...options, headers });
-        } catch (error) {
-            // Logout if refresh fails
-            useAuthStore.getState().logout();
-            throw error;
+            const data = await response.json() as { error?: string };
+            if (data.error) {
+                throw new Error(data.error);
+            }
+        } catch (e) {
+            // If not JSON or no error field, let ky handle it
+            if (e instanceof Error && e.message !== "Unexpected end of JSON input") {
+                throw e;
+            }
         }
     }
-
     return response;
-};
-
-/**
- * Fetcher para usar con SWR u otras librerías de data fetching
- * @param args Argumentos para el fetch
- * @returns Respuesta parseada como JSON
- * @see SWR documentation: https://swr.vercel.app/docs/getting-started
- */
-export const apiFetcher = (...args: unknown[]) => apiFetch(...(args as [string, RequestInit]))
-    .then(res => res.json());
-
-
-export const updateRecurso = async (recurso: Recurso): Promise<Boolean> => {
-    const response = await apiFetch(`/api/recursos/${recurso.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(recurso),
-    });
-
-    return response.ok;
 }
 
-export const deleteRecurso = async (id: number): Promise<Boolean> => {
-    const response = await apiFetch(`/api/recursos/${id}`, {
-        method: 'DELETE',
-    });
-    
-    return response.ok;
-}
+export const api = ky.extend({
+    prefixUrl: "http://localhost:8080/api",
+    retry: {
+        limit: 1,
+        statusCodes: [401]
+    },
+    hooks: {
+        beforeRequest: [setTokenHeader],
+        beforeRetry: [refreshToken],
+        afterResponse: [handleResponseError]
+    }
+})
 
-export const createRecurso = async (recurso: Partial<Recurso>): Promise<Boolean> => {
-    const response = await apiFetch(`/api/recursos`, {
-        method: 'POST',
-        body: JSON.stringify(recurso),
-    });
-    
-    return response.ok;
-}
+export const fetcher = <T>(url: string) => api.get(url).json<T>();
