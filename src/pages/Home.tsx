@@ -17,9 +17,18 @@ export default function Home() {
             >
                 <InteractiveBlob />
 
-                <div className="flex flex-col items-start text-left relative z-10 w-full">
+                <div className="flex flex-col items-start text-left relative z-10 w-full gap-2">
                     <h1 className="text-4xl md:text-7xl font-bold tracking-tight">Proyecto Vulcano</h1>
-                    <p className='text-xl md:text-3xl font-medium text-gray-400'>Bienvenido {user?.sub} </p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <p className='text-xl md:text-3xl font-medium text-gray-400'>Bienvenido {user?.sub}</p>
+                        {user && (
+                            <span className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gray-900/90 text-white text-xs md:text-sm font-semibold tracking-wide shadow-sm border border-gray-900/20">
+                                <span className="uppercase tracking-widest">{user.roles?.split(' ')[0]}</span>
+                                <span className="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
+                                <span className="text-gray-200">Nivel {user.nivel}</span>
+                            </span>
+                        )}
+                    </div>
                 </div>
             </section>
 
@@ -29,6 +38,7 @@ export default function Home() {
                     title="Servicios"
                     icon={Command}
                     actions={[]}
+                    isAdmin={user?.roles?.includes('ADMIN')}
                 />
                 <DashboardCard
                     title="Recursos"
@@ -39,6 +49,7 @@ export default function Home() {
                         { label: 'Editar recursos', icon: Pencil, onClick: () => navigate('/recursos') },
                         { label: 'Eliminar recursos', icon: Trash2, variant: 'danger', onClick: () => navigate('/recursos') },
                     ]}
+                    isAdmin={user?.roles?.includes('ADMIN')}
                 />
                 <DashboardCard
                     title="Planos"
@@ -49,6 +60,7 @@ export default function Home() {
                         { label: 'Editar planos', icon: Pencil, onClick: () => navigate('/planos') },
                         { label: 'Eliminar planos', icon: Trash2, variant: 'danger', onClick: () => navigate('/planos') },
                     ]}
+                    isAdmin={user?.roles?.includes('ADMIN')}
                 />
                 <DashboardCard
                     title="Fundición"
@@ -59,6 +71,7 @@ export default function Home() {
                         { label: 'Editar fundición', icon: Pencil, onClick: () => navigate('/fundicion') },
                         { label: 'Eliminar fundición', icon: Trash2, variant: 'danger', onClick: () => navigate('/fundicion') },
                     ]}
+                    isAdmin={user?.roles?.includes('ADMIN')}
                 />
             </section>
 

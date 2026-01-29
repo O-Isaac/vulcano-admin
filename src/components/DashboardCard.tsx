@@ -11,10 +11,22 @@ interface DashboardCardProps {
     title: string;
     icon: LucideIcon;
     description?: string;
+    isAdmin?: boolean;
     actions: Action[];
 }
 
-export default function DashboardCard({ title, icon: Icon, description, actions }: DashboardCardProps) {
+export default function DashboardCard({ title, icon: Icon, description, actions, isAdmin }: DashboardCardProps) {
+    if (isAdmin === false) {
+        return (
+            <div className="h-full p-8 flex flex-col justify-center items-center gap-6 bg-gray-100/80 border-2 border-dashed border-gray-300 text-gray-400">
+                <Icon strokeWidth={0} className='size-8 opacity-30' fill='gray' />
+                <h3 className='font-medium text-xl mb-2'>{title}</h3>
+                <span className="text-sm font-semibold">Acceso restringido</span>
+                <span className="text-xs">No tienes permisos para ver esta sección</span>
+            </div>
+        );
+    }
+
     return (
         <div className="h-full p-8 flex flex-col justify-between gap-6 transition-colors hover:bg-gray-50/50">
             <div className="space-y-6">

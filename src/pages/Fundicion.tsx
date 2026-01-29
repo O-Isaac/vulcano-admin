@@ -133,7 +133,7 @@ export default function FundicionPage() {
                                             <div className="flex justify-between items-start mb-1">
                                                 <h3 className="font-bold text-zinc-900 group-hover:text-orange-600 transition-colors uppercase text-sm tracking-tight">{plano.nombre}</h3>
                                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white uppercase">
-                                                    {plano.recursoFabricado.rareza}
+                                                    {plano.recursoFabricado?.rareza}
                                                 </span>
                                             </div>
                                             <div className="flex gap-4 mt-4 pt-3 border-t border-zinc-100 font-mono text-[10px]">
