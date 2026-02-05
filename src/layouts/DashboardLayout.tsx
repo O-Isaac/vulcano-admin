@@ -4,8 +4,10 @@ import Header from '../components/Header';
 import IntroAnimation from '../components/IntroAnimation';
 import { useAuthStore } from '../store/useAuthStore';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useQueueMonitor } from '../hooks/useQueueMonitor';
 
 export default function DashboardLayout() {
+    useQueueMonitor();
     const user = useAuthStore((state) => state.user);
     const refreshUser = useAuthStore((state) => state.refreshUser);
     const [showIntro, setShowIntro] = useState(false);

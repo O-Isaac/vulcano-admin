@@ -1,4 +1,4 @@
-import { Box, Hammer, LogOut, DollarSign } from 'lucide-react';
+import { Box, Hammer, LogOut, DollarSign, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Authenticate from './Authenticate';
@@ -131,6 +131,14 @@ export default function Header() {
                         >
                             <LogOut className="w-4 h-4" />
                             <span>Cerrar sesión</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => navigate('/ajustes')}
+                          className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                          title="Ajustes"
+                        >
+                           <Settings className="size-5" />
                         </button>
                     </div>
                     {/* Mobile */}
