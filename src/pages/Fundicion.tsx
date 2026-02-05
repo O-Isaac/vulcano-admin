@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Drawer } from "vaul";
 import useSWR from "swr";
@@ -8,6 +8,7 @@ import { fetcher } from "../lib/api";
 import type { Plano, Queue } from "../types/api";
 import { queuePlano, getActiveQueues } from "../services/vulcano.service";
 import { useAuthStore } from "../store/useAuthStore";
+import { Search, Timer, Hammer, X, Zap } from "lucide-react";
 
 export default function FundicionPage() {
     const [isActive, setIsActive] = useState(false);
@@ -15,9 +16,22 @@ export default function FundicionPage() {
     const [isOpen, setIsOpen] = useState(false);
     const refreshUser = useAuthStore((state) => state.refreshUser);
 
+    // States for UI/UX
+    const [searchTerm, setSearchTerm] = useState("");
+    const [rarityFilter, setRarityFilter] = useState("ALL");
+    const [selectedPlanoId, setSelectedPlanoId] = useState<number | null>(null);
+
     // Sincronización con el backend
     const { data: activeQueues, mutate, isLoading: isLoadingQueues } = useSWR("api/queues/active", getActiveQueues);
     const { data: planos } = useSWR("planos", fetcher<Plano[]>);
+
+    const filteredPlanos = useMemo(() => {
+        return planos?.filter(p => {
+            const matchesSearch = p.nombre.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesRarity = rarityFilter === "ALL" || p.recursoFabricado?.rareza?.toUpperCase() === rarityFilter;
+            return matchesSearch && matchesRarity;
+        }) || [];
+    }, [planos, searchTerm, rarityFilter]);
 
     const handleActivateSequence = () => {
         setIsLaunching(true);
@@ -28,6 +42,7 @@ export default function FundicionPage() {
     };
 
     const handleSelectPlano = async (plano: Plano) => {
+        // Simple confirmation via UI selection or direct (keeping direct for now but improved visuals)
         toast.promise(queuePlano(plano.id), {
             loading: "Iniciando forja...",
             success: () => {
@@ -38,6 +53,16 @@ export default function FundicionPage() {
             },
             error: "Error al iniciar la forja"
         });
+    };
+
+    const getRarityColor = (rarity?: string) => {
+        switch (rarity?.toUpperCase()) {
+            case 'COMUN': return 'bg-gray-100 text-gray-600 border-gray-200';
+            case 'RARO': return 'bg-blue-50 text-blue-600 border-blue-200';
+            case 'EPICO': return 'bg-purple-50 text-purple-600 border-purple-200';
+            case 'LEGENDARIO': return 'bg-orange-50 text-orange-600 border-orange-200';
+            default: return 'bg-gray-100 text-gray-600 border-gray-200';
+        }
     };
 
     return (
@@ -114,37 +139,145 @@ export default function FundicionPage() {
                     </AnimatePresence>
                 </section>
 
-                {/* Drawer (Selección de Planos - Estilo Blanco Limpio) */}
+                {/* Drawer (Selección de Planos - UI Mejorada) */}
                 <Drawer.Portal>
-                    <Drawer.Overlay className="fixed inset-0 bg-zinc-900/20 backdrop-blur-sm z-[60]" />
-                    <Drawer.Content className="bg-white flex flex-col rounded-t-[32px] max-h-[92%] fixed bottom-0 left-0 right-0 z-[70] outline-none shadow-2xl">
-                        <div className="p-8 flex-1 overflow-y-auto">
-                            <div className="mx-auto w-12 h-1 rounded-full bg-zinc-200 mb-8" />
-                            <div className="max-w-2xl mx-auto">
-                                <header className="mb-8">
-                                    <Drawer.Title className="font-black text-3xl text-zinc-900 tracking-tight uppercase">Planos de Forja</Drawer.Title>
-                                    <p className="text-zinc-500 text-sm">Selecciona una estructura para comenzar la síntesis.</p>
-                                </header>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">
-                                    {planos?.map((plano) => (
-                                        <div
-                                            key={plano.id}
-                                            onClick={() => handleSelectPlano(plano)}
-                                            className="p-5 rounded-2xl border border-zinc-100 bg-zinc-50/50 hover:bg-white hover:border-orange-500 hover:shadow-md transition-all cursor-pointer group"
+                    <Drawer.Overlay className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-[60]" />
+                    <Drawer.Content className="bg-gray-50 flex flex-col rounded-t-[32px] h-[95%] fixed bottom-0 left-0 right-0 z-[70] outline-none shadow-2xl border-t border-white/20">
+                        
+                        {/* Header Sticky */}
+                        <div className="p-6 pb-2 shrink-0 bg-white rounded-t-[32px] border-b border-gray-100">
+                            <div className="mx-auto w-12 h-1.5 rounded-full bg-gray-200 mb-6" />
+                            
+                            <div className="max-w-4xl mx-auto w-full space-y-6">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="font-black text-2xl text-gray-900 tracking-tight uppercase flex items-center gap-2">
+                                            <Hammer className="size-6 text-orange-500" />
+                                            Base de Planos
+                                        </h2>
+                                        <p className="text-gray-400 text-sm mt-1">Selecciona un diseño para sintetizar en la forja.</p>
+                                    </div>
+                                    
+                                    {/* Search Bar */}
+                                    <div className="relative group w-full md:w-72">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors size-4" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Buscar plano..." 
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full bg-gray-100 border-2 border-transparent focus:bg-white focus:border-orange-500 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium transition-all outline-none placeholder:text-gray-400"
+                                        />
+                                        {searchTerm && (
+                                            <button 
+                                                onClick={() => setSearchTerm('')} 
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                <X className="size-3" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Filtros */}
+                                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar mask-gradient">
+                                    {['ALL', 'COMUN', 'RARO', 'EPICO', 'LEGENDARIO'].map((filter) => (
+                                        <button
+                                            key={filter}
+                                            onClick={() => setRarityFilter(filter)}
+                                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap border ${
+                                                rarityFilter === filter 
+                                                    ? 'bg-zinc-900 text-white border-zinc-900 shadow-md transform scale-105' 
+                                                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                            }`}
                                         >
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h3 className="font-bold text-zinc-900 group-hover:text-orange-600 transition-colors uppercase text-sm tracking-tight">{plano.nombre}</h3>
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white uppercase">
-                                                    {plano.recursoFabricado?.rareza}
-                                                </span>
-                                            </div>
-                                            <div className="flex gap-4 mt-4 pt-3 border-t border-zinc-100 font-mono text-[10px]">
-                                                <span className="text-zinc-400 uppercase">Costo: <b className="text-zinc-900">{plano.coste} UE</b></span>
-                                                <span className="text-zinc-400 uppercase">Tiempo: <b className="text-zinc-900">{Math.floor(plano.tiempoConstrucion / 1000)}s</b></span>
-                                            </div>
-                                        </div>
+                                            {filter === 'ALL' ? 'Todos' : filter}
+                                        </button>
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Contenido Scrollable */}
+                        <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+                            <div className="max-w-4xl mx-auto">
+                                {filteredPlanos?.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                                        <Search className="size-12 mb-4 opacity-20" />
+                                        <p className="font-medium">No se encontraron planos</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+                                        {filteredPlanos?.map((plano) => {
+                                            const isSelected = selectedPlanoId === plano.id;
+                                            return (
+                                                <motion.div
+                                                    layoutId={`plano-${plano.id}`}
+                                                    key={plano.id}
+                                                    onClick={() => setSelectedPlanoId(isSelected ? null : plano.id)}
+                                                    className={`relative bg-white rounded-2xl border transition-all cursor-pointer overflow-hidden group ${
+                                                        isSelected 
+                                                            ? 'border-orange-500 shadow-xl shadow-orange-500/10 ring-2 ring-orange-500/20' 
+                                                            : 'border-gray-200 hover:border-orange-300 hover:shadow-lg hover:-translate-y-1'
+                                                    }`}
+                                                >
+                                                    <div className="p-5">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className={`size-10 rounded-xl flex items-center justify-center text-lg font-bold border ${getRarityColor(plano.recursoFabricado?.rareza)}`}>
+                                                                {plano.nombre.charAt(0)}
+                                                            </div>
+                                                            <span className={`text-[9px] font-black px-2 py-1 rounded-full border ${getRarityColor(plano.recursoFabricado?.rareza)} uppercase`}>
+                                                                {plano.recursoFabricado?.rareza}
+                                                            </span>
+                                                        </div>
+
+                                                        <h3 className="font-bold text-gray-900 text-lg leading-tight mb-1">{plano.nombre}</h3>
+                                                        <p className="text-xs text-gray-400 line-clamp-2 min-h-[2.5em]">{plano.desc}</p>
+                                                        
+                                                        {/* Stats Grid */}
+                                                        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-100">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[9px] text-gray-400 uppercase font-bold flex items-center gap-1">
+                                                                    <Zap className="size-3" /> Costo
+                                                                </span>
+                                                                <span className="font-mono text-sm font-bold text-gray-900">{plano.coste.toLocaleString()} CR</span>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[9px] text-gray-400 uppercase font-bold flex items-center gap-1">
+                                                                    <Timer className="size-3" /> Tiempo
+                                                                </span>
+                                                                <span className="font-mono text-sm font-bold text-gray-900">{(plano.tiempoConstrucion / 1000)}s</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Selection Action Layer */}
+                                                    <AnimatePresence>
+                                                        {isSelected && (
+                                                            <motion.div 
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                exit={{ opacity: 0 }}
+                                                                className="absolute inset-0 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-4 z-10"
+                                                            >
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleSelectPlano(plano);
+                                                                    }}
+                                                                    className="w-full bg-black text-white py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-orange-600 transition-colors shadow-lg flex items-center justify-center gap-2 transform active:scale-95"
+                                                                >
+                                                                    <Hammer className="size-4" />
+                                                                    Fabricar
+                                                                </button>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </Drawer.Content>
