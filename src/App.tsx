@@ -14,6 +14,7 @@ import RecursosPages from './pages/Recursos';
 import PlanosPage from './pages/Planos';
 import FundicionPage from './pages/Fundicion';
 import InventoryPage from './pages/Inventory';
+import AdminInventory from './pages/AdminInventory';
 import Register from './pages/Register';
 import { Toaster } from 'sonner';
 
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
           <Route path="/planos" element={<PlanosPage />} />
           <Route path="/fundicion" element={<FundicionPage />} />
           <Route path="/inventario" element={<InventoryPage />} />
+          <Route path="/admin-inventario" element={<AdminInventory />} />
         </Route>
       </Route>
       <Route element={<AuthGuard />}>

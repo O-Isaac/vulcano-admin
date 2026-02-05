@@ -1,10 +1,14 @@
 import { api } from "../lib/api"
-import type { Componente, LoginResponseBody, Plano, Queue, Recurso, RegisterResponseBody } from "../types/api"
+import type { Componente, LoginResponseBody, Plano, Queue, Recurso, RegisterResponseBody, Jugador } from "../types/api"
 
 // Auth
 
 export const login = (username: string, password: string) => {
     return api.post("auth/login", { json: { username, password } }).json<LoginResponseBody>()
+}
+
+export const getMe = () => {
+    return api.get("jugadores/me").json<Jugador>()
 }
 
 export const register = (username: string, password: string, secondPassword: string) => {
@@ -89,3 +93,29 @@ export const getActiveQueues = async () => {
     const response = await api.get("queues/active");
     return response.json<Queue[]>();
 };
+
+// Inventario Admin
+export const getJugadores = async () => {
+    const response = await api.get("jugadores")
+    return response.json<Jugador[]>()
+}
+
+export const updateInventario = async (jugadorId: number, recursoId: number, cantidad: number) => {
+    const response = await api.put(`inventarios/${jugadorId}/${recursoId}`, { searchParams: { cantidad } })
+    return response.ok
+}
+
+export const addInventario = async (jugadorId: number, recursoId: number) => {
+     const response = await api.post(`inventarios/${jugadorId}/${recursoId}`)
+     return response.ok
+}
+
+export const addCreditos = async (jugadorId: number, cantidad: number) => {
+    const response = await api.patch(`jugadores/creditos/${jugadorId}/${cantidad}`)
+    return response.ok
+}
+
+export const createMyInventory = async (recursoId: number) => {
+    const response = await api.post(`inventarios/me/${recursoId}`)
+    return response.ok
+}

@@ -4,10 +4,10 @@ import Header from '../components/Header';
 import IntroAnimation from '../components/IntroAnimation';
 import { useAuthStore } from '../store/useAuthStore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Toaster } from 'sonner';
 
 export default function DashboardLayout() {
     const user = useAuthStore((state) => state.user);
+    const refreshUser = useAuthStore((state) => state.refreshUser);
     const [showIntro, setShowIntro] = useState(false);
     const [isAppReady, setIsAppReady] = useState(false);
 
@@ -19,7 +19,9 @@ export default function DashboardLayout() {
         } else {
             setIsAppReady(true);
         }
-    }, []);
+
+        refreshUser();
+    }, [refreshUser]);
 
     const handleIntroComplete = () => {
         setShowIntro(false);
@@ -29,7 +31,6 @@ export default function DashboardLayout() {
 
     return (
         <div className="min-h-screen bg-white">
-            <Toaster richColors theme="dark" />
             <AnimatePresence mode="wait">
                 {showIntro && (
                     <IntroAnimation

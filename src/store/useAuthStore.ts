@@ -1,15 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { jwtDecode } from 'jwt-decode';
-import { login } from '../services/vulcano.service';
+import { login, getMe } from '../services/vulcano.service';
 
 interface User {
-    iss: string;
-    sub: string;
-    exp: number;
-    iat: number;
-    roles: string;
-    nivel: number;
+    // JWT Standard Claims
+    iss?: string;
+    sub?: string;
+    exp?: number;
+    iat?: number;
+    
+    // App Specific (JWT or API)
+    roles?: string;
+    role?: string; // API
+    nivel?: number;
+    creditos?: number;
+    correo?: string;
+    id?: number;
 }
 
 interface AuthState {
@@ -20,31 +27,48 @@ interface AuthState {
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     setTokens: (access: string, refresh: string) => void;
+    refreshUser: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             accessToken: null,
             refreshToken: null,
             isAuthenticated: false,
             user: null,
 
+            refreshUser: async () => {
+                try {
+                    const profile = await getMe();
+                    set((state) => ({
+                        // Merge existing user state (JWT claims) with new profile data
+                        user: state.user ? { ...state.user, ...profile } : profile
+                    }));
+                } catch (error) {
+                   console.error("Failed to refresh user profile", error);
+                }
+            },
+
             login: async (username, password) => {
                 const response = await login(username, password);
 
                 try {
-                    const user = jwtDecode<User>(response.access_token);
+                    const decoded = jwtDecode<User>(response.access_token);
 
                     set({
                         accessToken: response.access_token,
                         refreshToken: response.refresh_token,
                         isAuthenticated: true,
-                        user,
+                        user: decoded,
                     });
+                    
+                    // Fetch full details
+                    await get().refreshUser();
+
                 } catch (error) {
-                    console.error("Failed to decode token", error);
-                    throw new Error('Invalid token received');
+                    console.error("Failed to decode token or fetch profile", error);
+                    throw new Error('Login failed');
                 }
             },
 
@@ -60,26 +84,30 @@ export const useAuthStore = create<AuthState>()(
 
             setTokens: (access, refresh) => {
                 try {
-                    const user = jwtDecode<User>(access);
-                    set({
+                    const decoded = jwtDecode<User>(access);
+                    set((state) => ({
                         accessToken: access,
                         refreshToken: refresh,
                         isAuthenticated: true,
-                        user,
-                    });
+                        // Preserve existing detailed user info if available, just update claims
+                        user: state.user ? { ...state.user, ...decoded } : decoded,
+                    }));
+                    
+                    // Try to refresh profile in background if we have tokens
+                    get().refreshUser().catch(console.error);
+
                 } catch {
                     set({
                         accessToken: access,
                         refreshToken: refresh,
                         isAuthenticated: true,
-                        // user? keep old or null? null is safer
                         user: null
                     });
                 }
             },
         }),
         {
-            name: 'auth-storage', // unique name
+            name: 'auth-storage',
         }
     )
 );

@@ -38,11 +38,11 @@ export default function RecursoForm({
   };
 
   const getRarityColor = (rarity?: string) => {
-    switch (rarity?.toLowerCase()) {
-      case 'comun': return 'text-gray-400';
-      case 'raro': return 'text-blue-500';
-      case 'epico': return 'text-purple-500';
-      case 'legendario': return 'text-orange-500';
+    switch (rarity?.toUpperCase()) {
+      case 'COMUN': return 'text-gray-400';
+      case 'RARO': return 'text-blue-500';
+      case 'EPICO': return 'text-purple-500';
+      case 'LEGENDARIO': return 'text-orange-500';
       default: return 'text-gray-400';
     }
   };
@@ -97,13 +97,13 @@ export default function RecursoForm({
               name="rareza"
               required
               className="w-full bg-transparent text-lg font-medium focus:outline-none appearance-none cursor-pointer"
-              value={recursoData.rareza?.toLowerCase() || "comun"}
+              value={recursoData.rareza?.toUpperCase() || "COMUN"}
               onChange={handleChange}
             >
-              <option value="comun">Común</option>
-              <option value="raro">Raro</option>
-              <option value="epico">Épico</option>
-              <option value="legendario">Legendario</option>
+              <option value="COMUN">COMUN</option>
+              <option value="RARO">RARO</option>
+              <option value="EPICO">EPICO</option>
+              <option value="LEGENDARIO">LEGENDARIO</option>
             </select>
           </div>
           <div className="absolute right-6 pointer-events-none text-gray-300 text-xs">▼</div>

@@ -1,14 +1,42 @@
-import { Box, Hammer, LogOut } from 'lucide-react';
+import { Box, Hammer, LogOut, DollarSign } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Authenticate from './Authenticate';
 import { MobileNav } from "./MobileNav";
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'framer-motion';
+
+function AnimatedNumber({ value }: { value: number }) {
+    const count = useMotionValue(value);
+    const rounded = useSpring(count, { mass: 0.5, stiffness: 150, damping: 15 });
+    const display = useTransform(rounded, (current) => Math.round(current).toLocaleString());
+
+    useEffect(() => {
+        count.set(value);
+    }, [value, count]);
+
+    return <motion.span>{display}</motion.span>;
+}
 
 export default function Header() {
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // Animation logic
+    const prevCreditosRef = useRef(user?.creditos);
+    const [diff, setDiff] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (user?.creditos !== undefined && prevCreditosRef.current !== undefined && user.creditos !== prevCreditosRef.current) {
+             const difference = user.creditos - prevCreditosRef.current;
+             setDiff(difference);
+             const timer = setTimeout(() => setDiff(null), 2000);
+             return () => clearTimeout(timer);
+        }
+        prevCreditosRef.current = user?.creditos;
+    }, [user?.creditos]);
 
     const handleLogout = () => {
         logout();
@@ -66,6 +94,28 @@ export default function Header() {
                             </span>
                         </button>
                         <div className="text-right pr-4 border-r border-gray-100 flex items-center gap-2">
+                             {/* Creditos */}
+                             {user && (
+                                <div className="relative">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold tracking-wide shadow-sm border border-yellow-200/50 mr-2 relative z-10">
+                                        <DollarSign className="w-3.5 h-3.5" />
+                                        <AnimatedNumber value={user.creditos ?? 0} />
+                                    </span>
+                                    <AnimatePresence>
+                                        {diff !== null && (
+                                            <motion.span
+                                                initial={{ opacity: 0, y: 0, scale: 0.5 }}
+                                                animate={{ opacity: 1, y: -20, scale: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.8, ease: "easeOut" }}
+                                                className={`absolute -right-2 top-0 text-xs font-black pointer-events-none z-20 ${diff > 0 ? 'text-green-500' : 'text-red-500'}`}
+                                            >
+                                                {diff > 0 ? '+' : ''}{diff.toLocaleString()}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            )}
                             <p className="text-sm font-bold text-gray-900">{user?.sub || 'User'}</p>
                             {user && (
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-900/90 text-white text-xs font-semibold tracking-wide shadow-sm border border-gray-900/20">
@@ -90,13 +140,22 @@ export default function Header() {
                                 <div className="flex flex-col gap-6">
                                     <div className="flex flex-col items-start gap-2">
                                         <p className="text-base font-bold text-gray-900 break-all">{user?.sub || 'User'}</p>
-                                        {user && (
-                                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-900/90 text-white text-xs font-semibold tracking-wide shadow-sm border border-gray-900/20 w-fit max-w-full overflow-x-auto">
-                                                <span className="uppercase tracking-widest">{user.roles?.split(' ')[0]}</span>
-                                                <span className="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
-                                                <span className="text-gray-200">Nv. {user.nivel}</span>
-                                            </span>
-                                        )}
+                                        <div className='flex gap-2 items-center flex-wrap'>
+                                            {user && (
+                                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-900/90 text-white text-xs font-semibold tracking-wide shadow-sm border border-gray-900/20 w-fit max-w-full overflow-x-auto">
+                                                    <span className="uppercase tracking-widest">{user.roles?.split(' ')[0]}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
+                                                    <span className="text-gray-200">Nv. {user.nivel}</span>
+                                                </span>
+                                            )}
+                                            {/* Creditos Mobile */}
+                                            {user && (
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold tracking-wide shadow-sm border border-yellow-200/50">
+                                                    <DollarSign className="w-3.5 h-3.5" />
+                                                    <span>{user.creditos?.toLocaleString() ?? 0}</span>
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <button
                                         onClick={() => { navigate('/inventario'); }}

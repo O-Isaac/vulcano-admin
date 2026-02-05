@@ -72,4 +72,5 @@ export interface Jugador {
   nivel: number;
   correo: string;
   role: string;
+  creditos: number;
 }

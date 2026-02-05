@@ -2,16 +2,18 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Drawer } from "vaul";
 import useSWR from "swr";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import fundicionImage from "../assets/fundicion.webp";
 import { fetcher } from "../lib/api";
 import type { Plano, Queue } from "../types/api";
 import { queuePlano, getActiveQueues } from "../services/vulcano.service";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function FundicionPage() {
     const [isActive, setIsActive] = useState(false);
     const [isLaunching, setIsLaunching] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const refreshUser = useAuthStore((state) => state.refreshUser);
 
     // Sincronización con el backend
     const { data: activeQueues, mutate, isLoading: isLoadingQueues } = useSWR("api/queues/active", getActiveQueues);
@@ -30,6 +32,7 @@ export default function FundicionPage() {
             loading: "Iniciando forja...",
             success: () => {
                 mutate(); // Refresca la lista para mostrar el nuevo contador
+                refreshUser(); // Updates credits
                 setIsOpen(false);
                 return `Forja iniciada: ${plano.nombre}`;
             },
@@ -39,7 +42,6 @@ export default function FundicionPage() {
 
     return (
         <Drawer.Root open={isOpen} onOpenChange={setIsOpen} shouldScaleBackground>
-            <Toaster position="top-center" richColors />
 
             <main className="relative w-full h-[70vh] md:h-[80vh] overflow-hidden bg-white font-sans">
                 {/* Fondo reactivo */}
