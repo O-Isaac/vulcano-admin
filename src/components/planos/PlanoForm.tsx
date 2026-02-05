@@ -93,8 +93,8 @@ export default function PlanoForm({
         });
     };
 
-    const handleUpdateQty = async (id: number) => {
-        toast.promise(updateComponente(id, { cantidad: editQuantity }), {
+    const handleUpdateQty = async (id: number, recursoId: number) => {
+        toast.promise(updateComponente(id, { cantidad: editQuantity, recursoId }), {
             loading: 'Actualizando cantidad...',
             success: () => {
                 mutateComp();
@@ -352,7 +352,7 @@ export default function PlanoForm({
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleUpdateQty(comp.id)}
+                                                        onClick={() => handleUpdateQty(comp.id, comp.recursoId || comp.recurso?.id!)}
                                                         className="p-1.5 hover:bg-green-50 text-green-600 rounded-md transition-colors"
                                                         title="Guardar"
                                                     >

@@ -27,7 +27,8 @@ export function useComponentes() {
     const handleUpdate = async (updated: Partial<Componente>) => {
         setSelectedComponente(updated as Componente);
 
-        toast.promise(apiUpdateComponente(updated as Componente), {
+        if (!updated.id) return;
+        toast.promise(apiUpdateComponente(updated.id, { cantidad: updated.cantidad || 0, recursoId: updated.recursoId }), {
             loading: 'Actualizando componente...',
             success: () => {
                 mutate("componentes");

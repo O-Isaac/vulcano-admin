@@ -35,7 +35,10 @@ export default function Register() {
       toast.promise(register(form.username, form.password, form.secondPassword), {
         loading: "Registrando usuario...",
         success: () => {
-          navigate("/login");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1000);
+
           return "Usuario registrado correctamente.";
         },
         error: "Error al registrar usuario.",

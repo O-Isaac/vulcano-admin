@@ -15,6 +15,7 @@ import PlanosPage from './pages/Planos';
 import FundicionPage from './pages/Fundicion';
 import InventoryPage from './pages/Inventory';
 import Register from './pages/Register';
+import { Toaster } from 'sonner';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,7 +44,12 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Fragment>
+      <Toaster richColors theme="dark" />
+      <RouterProvider router={router} />
+    </Fragment>
+  );
 }
 
 export default App;

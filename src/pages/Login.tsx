@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { Hammer } from 'lucide-react';
 import InteractiveBlob from '../components/InteractiveBlob';
 import Header from '../components/Header';
+import { HTTPError } from 'ky';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -23,8 +24,6 @@ export default function Login() {
             await login(email, password);
 
             navigate('/');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
             setLoading(false);
         }

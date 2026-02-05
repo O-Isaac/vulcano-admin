@@ -58,7 +58,7 @@ export const getComponentes = async () => {
     return response.json<Componente[]>()
 }
 
-export const updateComponente = async (id: number, data: { cantidad: number }) => {
+export const updateComponente = async (id: number, data: { cantidad: number, recursoId?: number }) => {
     const response = await api.put(`componentes/${id}`, { json: data })
     return response.ok
 }

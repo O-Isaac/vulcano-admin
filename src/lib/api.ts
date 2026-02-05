@@ -58,10 +58,19 @@ const refreshToken: BeforeRetryHook = async ({ request, options, error, retryCou
 const handleResponseError: AfterResponseHook = async (request, options, response) => {
     if (!response.ok) {
         try {
-            const data = await response.json() as { error?: string };
-            if (data.error) {
+            const data = await response.json() as {
+                error?: string,
+                detalles?: { error: string }
+            };
+
+            if (data.detalles) {
+                Object.values(data.detalles).forEach(detalle => {
+                    toast.error(detalle);
+                });
+            } else if (data.error) {
                 toast.error(data.error);
             }
+
         } catch (e) {
             // If not JSON or no error field, let ky handle it
             if (e instanceof Error && e.message !== "Unexpected end of JSON input") {
