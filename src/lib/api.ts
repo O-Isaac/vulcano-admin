@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { type RefreshTokenBody } from "../types/api";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 let refreshPromise: Promise<RefreshTokenBody> | null = null;
 
@@ -82,7 +82,7 @@ const handleResponseError: AfterResponseHook = async (request, options, response
 }
 
 export const api = ky.extend({
-    prefixUrl: "http://localhost:8080/api",
+    prefixUrl: API_URL,
     retry: {
         limit: 1,
         statusCodes: [401]
