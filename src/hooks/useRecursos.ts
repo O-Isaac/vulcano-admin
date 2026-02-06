@@ -11,6 +11,11 @@ export function useRecursos() {
     const { data, error, isLoading } = useSWR("recursos", fetcher<Recurso[]>);
 
     const handleAdd = async (nuevo: Partial<Recurso>) => {
+
+        if (nuevo.rareza) {
+            nuevo.rareza = nuevo.rareza.toUpperCase();
+        }
+
         toast.promise(apiCreateRecurso(nuevo), {
             loading: 'Añadiendo recurso...',
             success: () => {
