@@ -28,14 +28,18 @@ export default function Header() {
     const prevCreditosRef = useRef(user?.creditos);
     const [diff, setDiff] = useState<number | null>(null);
 
-    useEffect(() => {
-        if (user?.creditos !== undefined && prevCreditosRef.current !== undefined && user.creditos !== prevCreditosRef.current) {
-             const difference = user.creditos - prevCreditosRef.current;
-             setDiff(difference);
-             const timer = setTimeout(() => setDiff(null), 2000);
-             return () => clearTimeout(timer);
+   useEffect(() => {
+        const current = user?.creditos;
+        const prev = prevCreditosRef.current;
+
+        if (current !== undefined && prev !== undefined && current !== prev) {
+            setDiff(current - prev);
+            prevCreditosRef.current = current;
+            const timer = setTimeout(() => setDiff(null), 2000);
+            return () => clearTimeout(timer);
         }
-        prevCreditosRef.current = user?.creditos;
+
+        prevCreditosRef.current = current;
     }, [user?.creditos]);
 
     const handleLogout = () => {
