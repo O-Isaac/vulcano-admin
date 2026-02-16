@@ -21,7 +21,7 @@ const setTokenHeader: BeforeRequestHook = (request) => {
 }
 
 // Hook para refrescar el token
-const refreshToken: BeforeRetryHook = async ({ request, options, error, retryCount }) => {
+const refreshToken: BeforeRetryHook = async ({ request }) => {
     const refreshToken = useAuthStore.getState().refreshToken;
 
     if (!refreshToken) return ky.stop;
@@ -47,7 +47,7 @@ const refreshToken: BeforeRetryHook = async ({ request, options, error, retryCou
 
         // Seteamos el nuevo token en la petición que se va a reintentar
         request.headers.set("Authorization", `Bearer ${data.access_token}`);
-    } catch (error) {
+    } catch {
         refreshPromise = null; // Limpiar si falla
         useAuthStore.getState().logout?.();
         return ky.stop;
@@ -78,11 +78,12 @@ const handleResponseError: AfterResponseHook = async (request, options, response
             }
         }
     }
+    
     return response;
 }
 
 export const api = ky.extend({
-    prefixUrl: API_URL,
+    prefixUrl: API_URL, // https://<prefx>/<path>
     retry: {
         limit: 1,
         statusCodes: [401]
@@ -94,4 +95,5 @@ export const api = ky.extend({
     }
 })
 
+// SWR
 export const fetcher = <T>(url: string) => api.get(url).json<T>();

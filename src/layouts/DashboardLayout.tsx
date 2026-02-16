@@ -10,18 +10,10 @@ export default function DashboardLayout() {
     useQueueMonitor();
     const user = useAuthStore((state) => state.user);
     const refreshUser = useAuthStore((state) => state.refreshUser);
-    const [showIntro, setShowIntro] = useState(false);
-    const [isAppReady, setIsAppReady] = useState(false);
+    const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('vulcano_intro_shown'));
+    const [isAppReady, setIsAppReady] = useState(() => !!sessionStorage.getItem('vulcano_intro_shown'));
 
     useEffect(() => {
-        const hasShownIntro = sessionStorage.getItem('vulcano_intro_shown');
-
-        if (!hasShownIntro) {
-            setShowIntro(true);
-        } else {
-            setIsAppReady(true);
-        }
-
         refreshUser();
     }, [refreshUser]);
 
