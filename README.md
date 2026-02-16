@@ -1,75 +1,69 @@
-# React + TypeScript + Vite
+# Vulcano Admin 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Panel de administración y gestión para el sistema Vulcano.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-6-purple?logo=vite)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-3-cyan?logo=tailwindcss)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este proyecto es el cliente web administrativo para la API de **Vulcano**, diseñado para gestionar recursos, planos, inventarios y el sistema de fundición del juego.
 
-## React Compiler
+🔗 **Backend Repository:** [github.com/o-isaac/vulcano](https://github.com/o-isaac/vulcano)
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
 
-Note: This will impact Vite dev & build performances.
+## Características
 
-## Expanding the ESLint configuration
+*   **Gestión de Inventario**: Visualización y administración de recursos y componentes.
+*   **Sistema de Fundición**: Monitorización en tiempo real de colas de fabricación.
+*   **Editor de Planos**: Interfaz modular para crear y editar recetas de crafteo complejas.
+*   **Seguridad**: Autenticación basada en JWT con refresco automático de tokens.
+*   **UI Moderna**: Interfaz construida con TailwindCSS, Framer Motion y Lucide Icons.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tecnologías
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+*   **Core**: React 19 + TypeScript + Vite.
+*   **Estado**: Zustand (Global), SWR (Data Fetching).
+*   **Router**: React Router DOM.
+*   **Estilos**: TailwindCSS.
+*   **Animaciones**: Framer Motion.
+*   **Notificaciones**: Sonner.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Instalación y Uso
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1.  **Clonar este repositorio**
+    ```bash
+    git clone https://github.com/tu-usuario/vulcano-admin.git
+    cd vulcano-admin
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2.  **Instalar dependencias**
+    ```bash
+    pnpm install
+    # o
+    npm install
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3.  **Configurar entorno**
+    Asegúrate de tener el backend [Vulcano](https://github.com/o-isaac/vulcano) ejecutándose localmente o configura la URL de la API si es necesario.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+4.  **Iniciar servidor de desarrollo**
+    ```bash
+    pnpm dev
+    ```
+
+## Estructura del Proyecto
+
+*   `/src/components`: Componentes reutilizables (formularios, UI, cards).
+*   `/src/hooks`: Hooks personalizados (`usePlanoForm`, `useQueueMonitor`).
+*   `/src/pages`: Vistas principales de la aplicación.
+*   `/src/services`: Capa de comunicación con la API.
+*   `/src/store`: Estado global con Zustand.
+
+## Contribución
+
+Este proyecto es parte del ecosistema Vulcano. Si deseas contribuir al backend, visita el repositorio principal: [Vulcano API](https://github.com/o-isaac/vulcano).
+
+---
+Desarrollado con ❤️ para la gestión de recursos espaciales.
